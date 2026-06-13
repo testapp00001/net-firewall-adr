@@ -1,0 +1,6 @@
+{
+  "name": "Net Firewall",
+  "description": "A high-performance, battery-friendly per-app firewall requiring no root authorization. Protects your device using custom network routing configurations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

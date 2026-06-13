@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Net Firewall</string>
+    <string name="toast_shield_engaged">Bảo vệ đã kích hoạt &amp; Tường lửa hoạt động!</string>
+    <string name="toast_vpn_declined">Quyền VPN bị từ chối. Trạng thái bảo vệ hiện không hoạt động.</string>
+    <string name="toast_protection_engaged">Bảo vệ đã kích hoạt!</string>
+    <string name="toast_permission_granted">Đã cấp quyền thông báo!</string>
+    <string name="toast_permission_denied">Quyền thông báo bị từ chối. Bộ hẹn giờ tự động có thể không hiển thị.</string>
+    <string name="auditing_nodes">Đang kiểm tra cổng mạng ứng dụng...</string>
+    <string name="toast_firewall_paused">Tường lửa đã tạm dừng. Kết nối internet không được lọc.</string>
+    <string name="toast_blocked_apps">Đã chặn %d ứng dụng</string>
+    <string name="toast_restored_apps">Đã khôi phục mạng cho %d ứng dụng</string>
+    <string name="protection_engaged">Đã Bật Bảo Vệ</string>
+    <string name="firewall_idle">Tường Lửa Đang Tắt</string>
+    <string name="shield_indicator_desc">Trạng thái lá chắn bảo vệ</string>
+    <string name="vpn_active_desc">Đang lọc và chặn gói tin cho ứng dụng bị hạn chế</string>
+    <string name="vpn_inactive_desc">Cho phép tất cả lưu lượng ẩn chạy song song</string>
+    <string name="timer_active_prefix">Trạng thái hẹn giờ: Tự tắt sau </string>
+    <string name="timer_expiring">Đang đếm ngược...</string>
+    <string name="timer_selection_title">Cài Đặt Hẹn Giờ Hoạt Động</string>
+    <string name="timer_always_on">Bật liên tục</string>
+    <string name="timer_custom">Tự chọn...</string>
+    <string name="timer_custom_label">Nhập thời gian hoạt động (Phút)</string>
+    <string name="filter_status_title">Bộ Lọc Tường Lửa</string>
+    <string name="blocked_apps_title">Đã Chặn</string>
+    <string name="secure_nodes_title">Ổn Định</string>
+    <string name="filter_active_val">ĐANG BẬT</string>
+    <string name="filter_disabled_val">ĐANG KHÓA</string>
+    <string name="battery_card_title">Tối Ưu Pin &amp; Độ Trễ</string>
+    <string name="battery_card_desc">Nhờ tích hợp bộ lọc tường lửa trực tiếp vào bảng định tuyến hệ điều hành (thay vì trên không gian người dùng), dữ liệu an toàn sẽ hoàn toàn bỏ qua ứng dụng của chúng tôi. Điều này đem đến độ trễ 0% và triệt tiêu hao pin.</string>
+    <string name="search_placeholder">Tìm ứng dụng hoặc mã gói...</string>
+    <string name="search_desc">Tìm kiếm</string>
+    <string name="clear_desc">Xóa tìm kiếm</string>
+    <string name="filter_all_apps">Tất cả</string>
+    <string name="filter_user_apps">Người dùng</string>
+    <string name="filter_system">Hệ thống</string>
+    <string name="filter_blocked">Đã chặn</string>
+    <string name="apps_match_filter">%1$d ứng dụng khớp bộ lọc</string>
+    <string name="allow_all">Cho Phép Hết</string>
+    <string name="block_all">Chặn Tất Cả</string>
+    <string name="system_label">HỆ THỐNG</string>
+    <string name="app_icon_desc">Ảnh ứng dụng</string>
+    <string name="launcher_placeholder_desc">Biểu tượng mặc định</string>
+    <string name="no_results_desc">Không có kết quả</string>
+    <string name="no_apps_found">Không tìm thấy ứng dụng nào.</string>
+    <string name="no_matches_found">Không tìm thấy ứng dụng khớp cho \"%1$s\"</string>
+    
+    <!-- Notification strings -->
+    <string name="notification_running_title">Net Firewall đang chạy ẩn</string>
+    <string name="notification_running_desc">Kết nối mạng của bạn đang được lọc và bảo toàn hoàn toàn.</string>
+    <string name="notification_timer_desc">Bộ hẹn giờ tường lửa đang đếm ngược để tự đóng.</string>
+    <string name="notification_turn_off">Tắt Bảo Vệ</string>
+</resources>

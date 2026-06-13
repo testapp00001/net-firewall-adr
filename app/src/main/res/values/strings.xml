@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Net Firewall</string>
+    <string name="toast_shield_engaged">Shield Engaged &amp; Firewall Activated!</string>
+    <string name="toast_vpn_declined">VPN Permission was declined. Protection stands inactive.</string>
+    <string name="toast_protection_engaged">Protection Engaged!</string>
+    <string name="toast_permission_granted">Notification permission granted!</string>
+    <string name="toast_permission_denied">Notification permission denied. Custom timer may not show.</string>
+    <string name="auditing_nodes">Auditing Network Nodes...</string>
+    <string name="toast_firewall_paused">Firewall Paused. Internet unfiltered.</string>
+    <string name="toast_blocked_apps">Blocked %d applications</string>
+    <string name="toast_restored_apps">Restored network for %d apps</string>
+    <string name="protection_engaged">Protection Engaged</string>
+    <string name="firewall_idle">Firewall Idle</string>
+    <string name="shield_indicator_desc">Shield Status Indicator</string>
+    <string name="vpn_active_desc">Sinking network packets for blocked apps</string>
+    <string name="vpn_inactive_desc">Allowing all background telemetry</string>
+    <string name="timer_active_prefix">Timer active: Deactivating in </string>
+    <string name="timer_expiring">Expiring...</string>
+    <string name="timer_selection_title">Active Timer Selection</string>
+    <string name="timer_always_on">Always On</string>
+    <string name="timer_custom">Custom...</string>
+    <string name="timer_custom_label">Enter Duration (Minutes)</string>
+    <string name="filter_status_title">Filter Status</string>
+    <string name="blocked_apps_title">Blocked Apps</string>
+    <string name="secure_nodes_title">Secure Nodes</string>
+    <string name="filter_active_val">ACTIVE</string>
+    <string name="filter_disabled_val">DISABLED</string>
+    <string name="battery_card_title">Ultra-Low Power Sinking</string>
+    <string name="battery_card_desc">By configuring our filter on the OS routing table directly (rather than matching in user-space), allowed traffic completely bypasses our app. This delivers 0% latency and eliminates battery drain.</string>
+    <string name="search_placeholder">Search apps or package key...</string>
+    <string name="search_desc">Search</string>
+    <string name="clear_desc">Clear</string>
+    <string name="filter_all_apps">All Apps</string>
+    <string name="filter_user_apps">User Apps</string>
+    <string name="filter_system">System</string>
+    <string name="filter_blocked">Blocked</string>
+    <string name="apps_match_filter">%1$d apps matches filter</string>
+    <string name="allow_all">Allow All</string>
+    <string name="block_all">Block All</string>
+    <string name="system_label">SYSTEM</string>
+    <string name="app_icon_desc">App Icon</string>
+    <string name="launcher_placeholder_desc">Standard Launcher Placeholder</string>
+    <string name="no_results_desc">No results</string>
+    <string name="no_apps_found">No applications found.</string>
+    <string name="no_matches_found">No matches found for \"%1$s\"</string>
+    
+    <!-- Notification strings -->
+    <string name="notification_running_title">Net Firewall is Running</string>
+    <string name="notification_running_desc">Your local internet connection is fully filtered and secure.</string>
+    <string name="notification_timer_desc">Firewall timer active. Tabbing closes in countdown.</string>
+    <string name="notification_turn_off">Turn Off</string>
+</resources>
