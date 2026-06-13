@@ -37,23 +37,43 @@ jobs:
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          # 1. Restore the debug keystore from base64 if it exists, so debug config is fully compiled
+          # 1. Restore the debug keystore from base64 if it exists, or generate a new fallback debug keystore automatically
           if [ -f debug.keystore.base64 ]; then
-            echo "Decoding debug keystore..."
+            echo "Decoding debug keystore from repository base64..."
             base64 -d debug.keystore.base64 > debug.keystore
+          elif [ -f debug.keystore ]; then
+            echo "debug.keystore already exists."
           else
-            echo "No debug.keystore.base64 found. Let Gradle auto-generate if needed."
+            echo "No debug.keystore or debug.keystore.base64 found. Auto-generating fallback debug.keystore using keytool..."
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -alias androiddebugkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass android \
+              -keypass android \
+              -dname "CN=Android Debug,O=Android,C=US"
           fi
 
           # 2. Setup release keystore only if custom secrets exist to secure your distribution builds
           if [ ! -z "$RELEASE_KEYSTORE_BASE64" ]; then
-            echo "Custom release keystore detected. Decoding..."
+            echo "Custom release keystore secrets found. Decoding..."
             echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > my-upload-key.jks
           else
-            echo "No custom release keystore secret found. Will use a mock keystore for release block compilation."
-            # We copy the debug keystore to upload keystore path just as a placeholder so Gradle check passes
-            if [ -f debug.keystore ]; then
-              cp debug.keystore my-upload-key.jks
+            echo "No custom release keystore secret found. Will use a mock upload keystore with alias 'upload' for release compilation."
+            if [ -f my-upload-key.jks ]; then
+              echo "my-upload-key.jks already exists."
+            else
+              keytool -genkeypair -v \
+                -keystore my-upload-key.jks \
+                -alias upload \
+                -keyalg RSA \
+                -keysize 2048 \
+                -validity 10000 \
+                -storepass android \
+                -keypass android \
+                -dname "CN=Android Upload,O=Android,C=US"
             fi
           fi
 
