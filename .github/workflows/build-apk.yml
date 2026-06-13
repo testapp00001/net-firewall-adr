@@ -1,0 +1,110 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Sign APKs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Create fallback .env file
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            echo "GEMINI_API_KEY=dummy_value" > .env
+          fi
+
+      - name: Configure Keystores
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          # 1. Restore the debug keystore from base64 if it exists, so debug config is fully compiled
+          if [ -f debug.keystore.base64 ]; then
+            echo "Decoding debug keystore..."
+            base64 -d debug.keystore.base64 > debug.keystore
+          else
+            echo "No debug.keystore.base64 found. Let Gradle auto-generate if needed."
+          fi
+
+          # 2. Setup release keystore only if custom secrets exist to secure your distribution builds
+          if [ ! -z "$RELEASE_KEYSTORE_BASE64" ]; then
+            echo "Custom release keystore detected. Decoding..."
+            echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > my-upload-key.jks
+          else
+            echo "No custom release keystore secret found. Will use a mock keystore for release block compilation."
+            # We copy the debug keystore to upload keystore path just as a placeholder so Gradle check passes
+            if [ -f debug.keystore ]; then
+              cp debug.keystore my-upload-key.jks
+            fi
+          fi
+
+      - name: Grant Execute Permission to Gradlew
+        # Check if gradlew exists, grant permission, or just use system-wide gradle tasks
+        run: |
+          if [ -f gradlew ]; then
+            chmod +x gradlew
+          fi
+
+      - name: Run Applet Compile (Verification)
+        # Verify package compiles cleanly beforehand
+        run: ./gradlew compileDebugSources --no-daemon
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Build Release APK
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          # Build a release build. If the user hasn't setup release secrets, it will build with the fallback key.
+          if [ ! -z "$STORE_PASSWORD" ] && [ ! -z "$KEY_PASSWORD" ]; then
+            echo "Building fully signed Production Release APK..."
+            ./gradlew assembleRelease --no-daemon
+          else
+            echo "Building unsigned/placeholder-signed Release APK..."
+            # Setup fallback passwords so compile doesn't break due to missing env variables
+            export STORE_PASSWORD="android"
+            export KEY_PASSWORD="android"
+            ./gradlew assembleRelease --no-daemon
+          fi
+
+      - name: Locate and Rename Artifacts
+        run: |
+          mkdir -p build-artifacts
+          
+          # Copy Debug APK
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk build-artifacts/net-firewall-debug.apk
+          fi
+          
+          # Copy Release APK
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk build-artifacts/net-firewall-release.apk
+          fi
+
+      - name: Upload APKs as Workflow Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetFirewall-APKs
+          path: build-artifacts/
+          retention-days: 14
