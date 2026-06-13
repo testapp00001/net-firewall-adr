@@ -95,6 +95,7 @@ jobs:
         env:
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           # Build a release build. If the user hasn't setup release secrets, it will build with the fallback key.
           if [ ! -z "$STORE_PASSWORD" ] && [ ! -z "$KEY_PASSWORD" ]; then

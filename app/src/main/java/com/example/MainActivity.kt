@@ -164,143 +164,142 @@ fun FirewallScreen(
                 }
             }
             is FirewallUiState.Success -> {
-                Column(
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    // Title Header with Language Picker
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        
+                        // Title Header with Language Picker
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                                .padding(3.dp)
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            listOf("en" to "EN", "vi" to "VI").forEach { (code, label) ->
-                                val isSelected = appLanguageState == code
-                                val bg = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-                                val tc = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(10.dp))
-                                        .background(bg)
-                                        .clickable { viewModel.setAppLanguage(code) }
-                                        .padding(horizontal = 10.dp, vertical = 5.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = label,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = tc
-                                    )
+                            Text(
+                                text = stringResource(R.string.app_name),
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                    .padding(3.dp)
+                            ) {
+                                listOf("en" to "EN", "vi" to "VI").forEach { (code, label) ->
+                                    val isSelected = appLanguageState == code
+                                    val bg = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                                    val tc = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(bg)
+                                            .clickable { viewModel.setAppLanguage(code) }
+                                            .padding(horizontal = 10.dp, vertical = 5.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = label,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = tc
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // 1. Dashboard Status Panel
-                    DashboardStatusPanel(
-                        isVpnActive = uiState.isVpnActive,
-                        blockedCount = uiState.blockedCount,
-                        allowedCount = uiState.allowedCount,
-                        timerOption = uiState.timerOption,
-                        customMinutes = uiState.customMinutes,
-                        expirationTimeMs = uiState.expirationTimeMs,
-                        onTimerOptionChange = { viewModel.setTimerOption(it) },
-                        onCustomMinutesChange = { viewModel.setCustomMinutes(it) },
-                        onToggleMaster = {
-                            if (uiState.isVpnActive) {
-                                viewModel.stopFirewallService()
-                                Toast.makeText(context, context.getString(R.string.toast_firewall_paused), Toast.LENGTH_SHORT).show()
-                            } else {
-                                if (android.os.Build.VERSION.SDK_INT >= 33 &&
-                                    androidx.core.content.ContextCompat.checkSelfPermission(
-                                        context,
-                                        android.Manifest.permission.POST_NOTIFICATIONS
-                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-                                ) {
-                                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    item {
+                        // 1. Dashboard Status Panel
+                        DashboardStatusPanel(
+                            isVpnActive = uiState.isVpnActive,
+                            blockedCount = uiState.blockedCount,
+                            allowedCount = uiState.allowedCount,
+                            timerOption = uiState.timerOption,
+                            customMinutes = uiState.customMinutes,
+                            expirationTimeMs = uiState.expirationTimeMs,
+                            onTimerOptionChange = { viewModel.setTimerOption(it) },
+                            onCustomMinutesChange = { viewModel.setCustomMinutes(it) },
+                            onToggleMaster = {
+                                if (uiState.isVpnActive) {
+                                    viewModel.stopFirewallService()
+                                    Toast.makeText(context, context.getString(R.string.toast_firewall_paused), Toast.LENGTH_SHORT).show()
                                 } else {
-                                    startVpnProcedureFlow()
+                                    if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                                        androidx.core.content.ContextCompat.checkSelfPermission(
+                                            context,
+                                            android.Manifest.permission.POST_NOTIFICATIONS
+                                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                                    ) {
+                                        notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                    } else {
+                                        startVpnProcedureFlow()
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    item {
+                        // 2. Battery & Efficiency Notice Card
+                        EfficiencyNoticeBox()
+                    }
 
-                    // 2. Battery & Efficiency Notice Card
-                    EfficiencyNoticeBox()
+                    item {
+                        // 3. App Search and Segmented Selector Node
+                        SearchBarAndFilter(
+                            query = uiState.searchQuery,
+                            onQueryChange = { viewModel.updateSearchQuery(it) },
+                            currentFilter = uiState.filterMode,
+                            onFilterChange = { viewModel.updateFilterMode(it) }
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // 3. App Search and Segmented Selector Node
-                    SearchBarAndFilter(
-                        query = uiState.searchQuery,
-                        onQueryChange = { viewModel.updateSearchQuery(it) },
-                        currentFilter = uiState.filterMode,
-                        onFilterChange = { viewModel.updateFilterMode(it) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // 4. Action Command Bar (Bulk configs)
-                    BulkControlBar(
-                        filteredList = uiState.filteredApps,
-                        onBlockAll = {
-                            viewModel.blockAllFiltered(uiState.filteredApps)
-                            Toast.makeText(context, context.getString(R.string.toast_blocked_apps, uiState.filteredApps.size), Toast.LENGTH_SHORT).show()
-                        },
-                        onUnblockAll = {
-                            viewModel.unblockAll(uiState.filteredApps)
-                            Toast.makeText(context, context.getString(R.string.toast_restored_apps, uiState.filteredApps.size), Toast.LENGTH_SHORT).show()
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
+                    item {
+                        // 4. Action Command Bar (Bulk configs)
+                        BulkControlBar(
+                            filteredList = uiState.filteredApps,
+                            onBlockAll = {
+                                viewModel.blockAllFiltered(uiState.filteredApps)
+                                Toast.makeText(context, context.getString(R.string.toast_blocked_apps, uiState.filteredApps.size), Toast.LENGTH_SHORT).show()
+                            },
+                            onUnblockAll = {
+                                viewModel.unblockAll(uiState.filteredApps)
+                                Toast.makeText(context, context.getString(R.string.toast_restored_apps, uiState.filteredApps.size), Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
 
                     // 5. Scroll View of Configurable Applications
                     if (uiState.filteredApps.isEmpty()) {
-                        EmptyAppsState(uiState.searchQuery)
-                    } else {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) {
-                            items(
-                                items = uiState.filteredApps,
-                                key = { it.packageName }
-                            ) { appModel ->
-                                AppFirewallRowCard(
-                                    appModel = appModel,
-                                    loadIcon = { viewModel.loadIcon(it) },
-                                    onToggle = { viewModel.toggleAppBlock(appModel) }
-                                )
-                            }
-                            item {
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
+                        item {
+                            EmptyAppsState(uiState.searchQuery)
                         }
+                    } else {
+                        items(
+                            items = uiState.filteredApps,
+                            key = { it.packageName }
+                        ) { appModel ->
+                            AppFirewallRowCard(
+                                appModel = appModel,
+                                loadIcon = { viewModel.loadIcon(it) },
+                                onToggle = { viewModel.toggleAppBlock(appModel) }
+                            )
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
