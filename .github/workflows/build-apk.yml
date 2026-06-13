@@ -66,10 +66,10 @@ jobs:
 
       - name: Run Applet Compile (Verification)
         # Verify package compiles cleanly beforehand
-        run: ./gradlew compileDebugSources --no-daemon
+        run: gradle compileDebugSources --no-daemon
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: gradle assembleDebug --no-daemon
 
       - name: Build Release APK
         env:
@@ -79,13 +79,13 @@ jobs:
           # Build a release build. If the user hasn't setup release secrets, it will build with the fallback key.
           if [ ! -z "$STORE_PASSWORD" ] && [ ! -z "$KEY_PASSWORD" ]; then
             echo "Building fully signed Production Release APK..."
-            ./gradlew assembleRelease --no-daemon
+            gradle assembleRelease --no-daemon
           else
             echo "Building unsigned/placeholder-signed Release APK..."
             # Setup fallback passwords so compile doesn't break due to missing env variables
             export STORE_PASSWORD="android"
             export KEY_PASSWORD="android"
-            ./gradlew assembleRelease --no-daemon
+            gradle assembleRelease --no-daemon
           fi
 
       - name: Locate and Rename Artifacts
