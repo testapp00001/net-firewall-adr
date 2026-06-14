@@ -92,7 +92,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'upload' }}
         run: |
           echo "Building verification and debug targets..."
-          ./gradlew compileDebugSources assembleDebug assembleRelease --no-daemon
+          gradle compileDebugSources assembleDebug assembleRelease --no-daemon
 
       # --- STEP 2: PRODUCTION v1.0 RELEASE COMPILATION (Runs ONLY when pushing a version tag) ---
       - name: Build Official Production Release APK
@@ -108,7 +108,7 @@ jobs:
             exit 1
           fi
           echo "Building optimized and signed Production Release APK..."
-          ./gradlew compileDebugSources assembleRelease --no-daemon
+          gradle compileDebugSources assembleRelease --no-daemon
 
       - name: Locate and Rename Artifacts
         run: |
