@@ -11,6 +11,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import java.io.FileInputStream
 import androidx.core.app.NotificationCompat
 import com.example.MainActivity
 import com.example.R
@@ -42,6 +43,7 @@ class FirewallVpnService : VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
     private lateinit var repository: FirewallRepository
     private var timerJob: Job? = null
+    private var readJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -180,6 +182,19 @@ class FirewallVpnService : VpnService() {
             builder.addAddress("fd00::1", 128)
             builder.addRoute("::", 0)
 
+            // DNS sinkhole routing configuration:
+            // Designate local loopback addresses (127.0.0.1/::1) as primary DNS servers for the tunnel.
+            // When blocked applications attempt to resolve domain names, query packets hit localhost
+            // port 53. Since no resolver runs on the local port, the device's kernel immediately
+            // returns ICMP Port Unreachable. This triggers an instantaneous socket failure in the application,
+            // bypassing standard 1-5 minute timeouts and letting the app switch to local/offline modes instantly.
+            try {
+                builder.addDnsServer("127.0.0.1")
+                builder.addDnsServer("::1")
+            } catch (e: Exception) {
+                Log.w(TAG, "Unable to register local loopback fallback DNS servers", e)
+            }
+
             if (blockedPackages.isNotEmpty()) {
                 // Point routing exclusively to selected blocked applications
                 for (pkg in blockedPackages) {
@@ -210,7 +225,9 @@ class FirewallVpnService : VpnService() {
             vpnInterface = nextInterface
             oldInterface?.close()
 
-            Log.i(TAG, "Firewall VPN interface configuration applied successfully.")
+            startPacketReader(nextInterface)
+
+            Log.i(TAG, "Firewall VPN interface configuration applied successfully with packet flow consumer.")
         } catch (e: Exception) {
             Log.e(TAG, "Critical error configuring local VPN firewall interface", e)
         }
@@ -221,6 +238,8 @@ class FirewallVpnService : VpnService() {
         isRunning = false
         timerJob?.cancel()
         timerJob = null
+        readJob?.cancel()
+        readJob = null
 
         val prefs = getSharedPreferences("firewall_prefs", Context.MODE_PRIVATE)
         prefs.edit().putLong("key_expiration_timestamp_ms", 0L).apply()
@@ -247,6 +266,34 @@ class FirewallVpnService : VpnService() {
             }
             val manager = getSystemService(NotificationManager::class.java)
             manager?.createNotificationChannel(serviceChannel)
+        }
+    }
+
+    private fun startPacketReader(pfd: ParcelFileDescriptor?) {
+        readJob?.cancel()
+        if (pfd == null) return
+
+        readJob = serviceScope.launch(Dispatchers.IO) {
+            val fd = pfd.fileDescriptor
+            val inputStream = FileInputStream(fd)
+            val buffer = ByteArray(32768)
+            try {
+                while (isRunning) {
+                    val readBytes = inputStream.read(buffer)
+                    if (readBytes <= 0) {
+                        break
+                    }
+                    // Simply discard the packet!
+                    // This clears the VPN interface buffer so the OS socket layer
+                    // doesn't block or stall on full buffers, helping apps run smoothly.
+                }
+            } catch (e: Exception) {
+                Log.d(TAG, "Packet reader stopped: ${e.message}")
+            } finally {
+                try {
+                    inputStream.close()
+                } catch (ignored: Exception) {}
+            }
         }
     }
 
